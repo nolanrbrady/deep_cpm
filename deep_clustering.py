@@ -6,6 +6,8 @@ import re
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, models
+from tensorflow.keras.layers import Input, Dense, LSTM, Attention, Concatenate, Lambda
+from tensorflow.keras.models import Sequential, Model
 from sklearn.preprocessing import normalize
 from scipy import stats
 
@@ -100,7 +102,7 @@ for sub_id, sub in enumerate(ts_data):
 		autoencoder.compile(optimizer='adam', loss='mse')
 
 		# Train the autoencoder
-		autoencoder.fit(data, data, epochs=10, batch_size=16, shuffle=True)
+		autoencoder.fit(data, data, epochs=100, batch_size=16, shuffle=True)
 
 		# Encode the data to obtain the latent representations
 		latent_rep= encoder.predict(data)
@@ -119,10 +121,9 @@ for sub_id, sub in enumerate(ts_data):
 
 		# Uncomment for testing
 		#if sub_id > 3:
-			#break
+		#	break
 
 # Keep only the arrays with data populated from subjects (rest are zero placeholders)
-print("Phen_data size: ", phen_data.size)
 all_data = all_data[:phen_data.size,:,:]
 print("All Data Shape: ", all_data.shape, "Phenotype data: ", phen_data.shape)
 flat_df = pd.DataFrame(all_data.flatten())
@@ -132,10 +133,7 @@ flat_df.to_csv(f"{folder_path}/encoded_timeseries.csv", index=False, header=Fals
 # Train autoencoder for z dimension reduction 
 #============================================
 
-#TODO: Incorporate multiple inputs here to incorporate the phenotypic data
-# https://stackoverflow.com/questions/55233377/keras-sequential-model-with-multiple-inputs
-
-data = np.reshape(all_data, (all_data.shape[0], -1))
+data = np.reshape(all_data, (all_data.shape[0], -1)).T
 
 print("Data Shape before 2nd AE: ", data.shape)
 
@@ -147,51 +145,33 @@ z_encoder = models.Sequential([
 	layers.Dense(encoding_dim, activation='relu', input_shape=input_shape),
 	layers.Dense(bottle_neck_dim, activation='relu'),
 	layers.Dense(encoding_dim, activation='relu'),
-	layers.Dense(data.shape[1], activation='sigmoid')
+	layers.Dense(1, activation='sigmoid')
 	])
 
 # Compile the model
 z_encoder.compile(optimizer='adam', loss='mean_squared_error')
 
 # Train the autoencoder
-z_encoder.fit(data, data, epochs=10, batch_size=16, shuffle=True)
+z_encoder.fit(data, data, epochs=100, batch_size=16, shuffle=True)
 
 # Use the trained autoencoder to encode the data
 encoded_data = z_encoder.predict(data)
+print("Encoded Data Shape: ", encoded_data.shape)
 
 # Reshape the encoded data back to the desired shape
-final_encoded_data = np.reshape(encoded_data, (1, data.shape[0], data.shape[1]))
-"""
-# Define the neural network model
-input_timeseries = Input(shape=(data.shape[1],))
+#final_encoded_data = np.reshape(encoded_data, (1, data.shape[0], data.shape[1]))
+final_encoded_data = np.reshape(encoded_data, (268, 100))
+data = final_encoded_data
 
-# Add attention mechanism to focus on important regions
-attention_probs = Dense(data.shape[1], activation='softmax', name='attention_probs')(input_timeseries)
-attention_mul = Concatenate()([input_timeseries, attention_probs])
+print("Final encoded data: ", final_encoded_data, final_encoded_data.shape)
 
-# Add a dense layer for prediction
-output_behavior = Dense(1, activation='linear')(attention_mul)
-
-# Create the model
-model = Model(inputs=input_timeseries, outputs=[output_behavior, attention_probs])
-
-# Compile the model
-model.compile(optimizer='adam', loss='mean_squared_error')
-
-# Train the model
-model.fit(data, [phen_data, np.zeros_like(phen_data)], epochs=50, batch_size=32, shuffle=True)
-
-# Get the attention weights for a specific subject
-subject_index = 0
-attention_weights = model.predict(data[subject_index:subject_index+1])[1]
-print(attention_weights)
-"""
 #=================================== 
 # Calculate node level similarities 
 #===================================
 
 # Compute pairwise similarities
 pairwise_similarities = np.zeros((len(data), len(data)))
+print("Length of data: ", len(data))
 
 for i in range(len(data)):
 	for j in range(len(data)):
@@ -221,7 +201,7 @@ print("Clusters:", clusters)
 #========================================
 # Create a sparse matrix for connectivity
 #========================================
-
+	
 fc_matrix = np.zeros((268, 268))
 
 print("Generating the connectivity matrix")
