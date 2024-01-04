@@ -172,7 +172,8 @@ z_encoder = models.Sequential([
 	])
 
 z_decoder = models.Sequential([
-	layers.Dense(1, activation='relu', input_shape=(1,))
+	layers.InputLayer(input_shape=(1,)),
+	layers.Dense(1, activation='relu'),
 	layers.Dense(bottle_neck_dim, activation='relu'),
 	layers.Dense(encoding_dim, activation='sigmoid'),
 	])
