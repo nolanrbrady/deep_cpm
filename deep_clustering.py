@@ -13,9 +13,11 @@ from scipy import stats
 
 """
 Things to do
-- Get the DTW comparison working
-- Figure out  how to incorporate the behavioral data into the AE
+- Evaluate the efficacy of the AE (adjust the hyperparameters)
+- Figure out how to get directionlity of connections
+	- Could take the correlatin of the 2nd AE node time series with the phenotype
 - Check the predictability of the model for benchmarking
+- Evaluate the amount of loss for both of the autoencoders
 """
 
 folder_path = '/home/nbrady/Desktop/deep_functional_net'
@@ -35,6 +37,10 @@ def cosine_similarity(a, b):
 	norm_a = np.linalg.norm(a)
 	norm_b = np.linalg.norm(b)
 	return dot_product / (norm_a * norm_b)
+
+def softmax(matrix, axis=1):
+	exp_matrix = np.exp(matrix - np.max(matrix, axis=axis, keepdims=True))
+	return exp_matrix / np.sum(exp_matrix, axis=axis, keepdims=True)
 
 def dynamic_time_warp(x, y):
 	# Create the distance matrix.
@@ -138,7 +144,10 @@ flat_df.to_csv(f"{folder_path}/encoded_timeseries.csv", index=False, header=Fals
 
 #========================================================
 # Incorporate the Phenotype as a weight to the timeseries
+# Also find the correlation for directionality
 #========================================================
+
+r_val = np.zeros((num_subs, 268, 268))
 
 for sub_pos in range(len(all_data)):
 	phen_val = phen_data[sub_pos]
@@ -159,8 +168,13 @@ bottle_neck_dim = 50
 z_encoder = models.Sequential([
 	layers.Dense(encoding_dim, activation='relu', input_shape=input_shape),
 	layers.Dense(bottle_neck_dim, activation='relu'),
-	layers.Dense(encoding_dim, activation='relu'),
 	layers.Dense(1, activation='sigmoid')
+	])
+
+z_decoder = models.Sequential([
+	layers.Dense(1, activation='relu', input_shape=(1,))
+	layers.Dense(bottle_neck_dim, activation='relu'),
+	layers.Dense(encoding_dim, activation='sigmoid'),
 	])
 
 # Compile the model
@@ -190,24 +204,20 @@ print("Length of data: ", len(data))
 
 for i in range(len(data)):
 	for j in range(len(data)):
-		pairwise_similarities[i, j] = cosine_similarity(latent_rep[i], latent_rep[j])
-		#pairwise_similarities[i, j] = dynamic_time_warp(latent_rep[i], latent_rep[j])
+		#pairwise_similarities[i, j] = cosine_similarity(latent_rep[i], latent_rep[j])
+		pairwise_similarities[i, j] = dynamic_time_warp(latent_rep[i], latent_rep[j])
 
-# Normalize the dynamic time warping results using modified z-score for outliers
-#TODO: Figure out how to normalize the DTW effectively
-#pw_median = np.median(pairwise_similarities)
-#pw_mad = np.median(np.abs(pairwise_similarities) - pw_median)
-
-#pairwise_similarities = 0.6745 * (pairwise_similarities - median) / mad
-#print("Pairwise simialarities: ", pairwise_similarities)
+# Normalize the dynamic time warping results to a p-value
+pairwise_similarities = softmax(pairwise_similarities, axis=1)
 
 # Set a threshold for clustering
-threshold = 0.92
+#threshold = 0.92 # for cosine similarity
+threshold = 0.001 # for DTW with softmax
 
 # Apply threshold for clustering
 clusters = []
 for i in range(len(data)):
-	cluster = [j for j in range(len(data)) if pairwise_similarities[i, j] > threshold]
+	cluster = [j for j in range(len(data)) if pairwise_similarities[i, j] < threshold]
 	clusters.append(cluster)
 
 print("Clusters:", clusters)
