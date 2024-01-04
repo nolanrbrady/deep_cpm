@@ -11,6 +11,13 @@ from tensorflow.keras.models import Sequential, Model
 from sklearn.preprocessing import normalize
 from scipy import stats
 
+"""
+Things to do
+- Get the DTW comparison working
+- Figure out  how to incorporate the behavioral data into the AE
+- Check the predictability of the model for benchmarking
+"""
+
 folder_path = '/home/nbrady/Desktop/deep_functional_net'
 phenotypes = pd.read_csv(f'{folder_path}/PHEN_MATRIX.csv')
 
@@ -102,7 +109,7 @@ for sub_id, sub in enumerate(ts_data):
 		autoencoder.compile(optimizer='adam', loss='mse')
 
 		# Train the autoencoder
-		autoencoder.fit(data, data, epochs=100, batch_size=16, shuffle=True)
+		autoencoder.fit(data, data, epochs=10, batch_size=16, shuffle=True)
 
 		# Encode the data to obtain the latent representations
 		latent_rep= encoder.predict(data)
@@ -120,14 +127,22 @@ for sub_id, sub in enumerate(ts_data):
 		all_data[sub_id] = latent_rep
 
 		# Uncomment for testing
-		#if sub_id > 3:
-		#	break
+		if sub_id > 3:
+			break
 
 # Keep only the arrays with data populated from subjects (rest are zero placeholders)
 all_data = all_data[:phen_data.size,:,:]
 print("All Data Shape: ", all_data.shape, "Phenotype data: ", phen_data.shape)
 flat_df = pd.DataFrame(all_data.flatten())
 flat_df.to_csv(f"{folder_path}/encoded_timeseries.csv", index=False, header=False)
+
+#========================================================
+# Incorporate the Phenotype as a weight to the timeseries
+#========================================================
+
+for sub_pos in range(len(all_data)):
+	phen_val = phen_data[sub_pos]
+	all_data[sub_pos,:,:] = all_data[sub_pos,:,:] * phen_val
 
 #============================================ 
 # Train autoencoder for z dimension reduction 
@@ -152,7 +167,7 @@ z_encoder = models.Sequential([
 z_encoder.compile(optimizer='adam', loss='mean_squared_error')
 
 # Train the autoencoder
-z_encoder.fit(data, data, epochs=100, batch_size=16, shuffle=True)
+z_encoder.fit(data, data, epochs=10, batch_size=16, shuffle=True)
 
 # Use the trained autoencoder to encode the data
 encoded_data = z_encoder.predict(data)
