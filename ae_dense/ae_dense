@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "ae_training_dense.py", line 8, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+srun: error: gpu004: task 0: Exited with exit code 1

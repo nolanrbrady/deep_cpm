@@ -1,0 +1,5 @@
+  File "/home/nbrady/Desktop/deep_functional_net/scripts/ae_dense/ae_training_dense.py", line 127
+    layers.Dense(input_shape[0], activation='relu')  # Output layer to match input features
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?
+srun: error: gpu004: task 0: Exited with exit code 1

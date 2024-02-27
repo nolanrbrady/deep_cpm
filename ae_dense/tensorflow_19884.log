@@ -1,0 +1,21 @@
+2024-02-26 13:23:11.125848: I external/local_tsl/tsl/cuda/cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+2024-02-26 13:23:11.154064: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2024-02-26 13:23:11.154093: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2024-02-26 13:23:11.155190: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-02-26 13:23:11.160799: I external/local_tsl/tsl/cuda/cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+2024-02-26 13:23:11.160979: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-02-26 13:23:12.346507: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-02-26 13:23:41.905147: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2256] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+Train data shape: (65, 36209, 268)
+Test data shape: (17, 36209, 268)
+65 36209 268
+Input Shape:  (36209, 268)
+Output Shape:  9704012
+65 36209 268
+No checkpoint found. Starting training from scratch.
+Epoch 1/100
+slurmstepd: error: Detected 1 oom_kill event in StepId=19884.0. Some of the step tasks have been OOM Killed.
+srun: error: gpu004: task 0: Out Of Memory
+slurmstepd: error: Detected 1 oom_kill event in StepId=19884.batch. Some of the step tasks have been OOM Killed.
