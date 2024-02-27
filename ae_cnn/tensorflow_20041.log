@@ -1,0 +1,100 @@
+2024-02-26 17:35:25.535582: I external/local_tsl/tsl/cuda/cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+2024-02-26 17:35:25.563997: E external/local_xla/xla/stream_executor/cuda/cuda_dnn.cc:9261] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+2024-02-26 17:35:25.564132: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:607] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+2024-02-26 17:35:25.565069: E external/local_xla/xla/stream_executor/cuda/cuda_blas.cc:1515] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2024-02-26 17:35:25.570776: I external/local_tsl/tsl/cuda/cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+2024-02-26 17:35:25.571027: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-02-26 17:35:26.694272: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2024-02-26 17:35:59.787117: W tensorflow/core/common_runtime/gpu/gpu_device.cc:2256] Cannot dlopen some GPU libraries. Please make sure the missing libraries mentioned above are installed properly if you would like to use GPU. Follow the guide at https://www.tensorflow.org/install/gpu for how to download and setup the required libraries for your platform.
+Skipping registering GPU devices...
+Train data shape: (65, 36209, 268)
+Test data shape: (17, 36209, 268)
+65 36209 268
+Input Shape:  (36209, 268)
+65 36209 268
+Model: "autoencoder"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ autoencoder_input (InputLa  [(None, 36209, 268)]      0         
+ yer)                                                            
+                                                                 
+ encoder (Functional)        (None, 2264, 32)          335328    
+                                                                 
+ decoder (Functional)        (None, 36209, 268)        335564    
+                                                                 
+=================================================================
+Total params: 670892 (2.56 MB)
+Trainable params: 670892 (2.56 MB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+Model: "encoder"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ encoder_input (InputLayer)  [(None, 36209, 268)]      0         
+                                                                 
+ conv1d (Conv1D)             (None, 18105, 256)        206080    
+                                                                 
+ conv1d_1 (Conv1D)           (None, 9053, 128)         98432     
+                                                                 
+ conv1d_2 (Conv1D)           (None, 4527, 64)          24640     
+                                                                 
+ conv1d_3 (Conv1D)           (None, 2264, 32)          6176      
+                                                                 
+=================================================================
+Total params: 335328 (1.28 MB)
+Trainable params: 335328 (1.28 MB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+Model: "decoder"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ input_1 (InputLayer)        [(None, 2264, 32)]        0         
+                                                                 
+ conv1d_transpose (Conv1DTr  (None, 4528, 64)          6208      
+ anspose)                                                        
+                                                                 
+ conv1d_transpose_1 (Conv1D  (None, 9056, 128)         24704     
+ Transpose)                                                      
+                                                                 
+ conv1d_transpose_2 (Conv1D  (None, 18112, 256)        98560     
+ Transpose)                                                      
+                                                                 
+ conv1d_transpose_3 (Conv1D  (None, 36224, 268)        206092    
+ Transpose)                                                      
+                                                                 
+ cropping1d (Cropping1D)     (None, 36209, 268)        0         
+                                                                 
+=================================================================
+Total params: 335564 (1.28 MB)
+Trainable params: 335564 (1.28 MB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+Checkpoint found. Loading weights.
+Epoch 1/5
+1/4 [======>.......................] - ETA: 16s - loss: 9.52672/4 [==============>...............] - ETA: 9s - loss: 10.89723/4 [=====================>........] - ETA: 4s - loss: 10.91724/4 [==============================] - ETA: 0s - loss: 11.1511
+Epoch 1: val_loss improved from inf to 9.73618, saving model to ./best_ae_model_weight.h5
+4/4 [==============================] - 19s 5s/step - loss: 11.1511 - val_loss: 9.7362
+Epoch 2/5
+1/4 [======>.......................] - ETA: 14s - loss: 14.13382/4 [==============>...............] - ETA: 8s - loss: 11.7879 3/4 [=====================>........] - ETA: 4s - loss: 11.62764/4 [==============================] - ETA: 0s - loss: 11.1316
+Epoch 2: val_loss improved from 9.73618 to 9.71094, saving model to ./best_ae_model_weight.h5
+4/4 [==============================] - 18s 4s/step - loss: 11.1316 - val_loss: 9.7109
+Epoch 3/5
+1/4 [======>.......................] - ETA: 15s - loss: 9.96052/4 [==============>...............] - ETA: 10s - loss: 11.06403/4 [=====================>........] - ETA: 4s - loss: 10.9677 4/4 [==============================] - ETA: 0s - loss: 11.1110
+Epoch 3: val_loss improved from 9.71094 to 9.69105, saving model to ./best_ae_model_weight.h5
+4/4 [==============================] - 18s 4s/step - loss: 11.1110 - val_loss: 9.6911
+Epoch 4/5
+1/4 [======>.......................] - ETA: 13s - loss: 12.41392/4 [==============>...............] - ETA: 10s - loss: 12.33713/4 [=====================>........] - ETA: 4s - loss: 11.5524 4/4 [==============================] - ETA: 0s - loss: 11.0731
+Epoch 4: val_loss improved from 9.69105 to 9.64619, saving model to ./best_ae_model_weight.h5
+4/4 [==============================] - 18s 4s/step - loss: 11.0731 - val_loss: 9.6462
+Epoch 5/5
+1/4 [======>.......................] - ETA: 14s - loss: 12.63892/4 [==============>...............] - ETA: 10s - loss: 11.51513/4 [=====================>........] - ETA: 5s - loss: 10.9074 4/4 [==============================] - ETA: 0s - loss: 11.0421
+Epoch 5: val_loss improved from 9.64619 to 9.61692, saving model to ./best_ae_model_weight.h5
+4/4 [==============================] - 18s 4s/step - loss: 11.0421 - val_loss: 9.6169
+Decoder Input shape:  (2264, 32)
+1/2 [==============>...............] - ETA: 1s2/2 [==============================] - ETA: 0s2/2 [==============================] - 3s 900ms/step
+1/1 [==============================] - ETA: 0s1/1 [==============================] - 2s 2s/step
+Mean Squared Error: 10.129682911248167, Mean Absolute Error: 1.6473173989030212, Pearsons: 0.027340016933187737
