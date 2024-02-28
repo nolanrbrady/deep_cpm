@@ -128,29 +128,29 @@ print(train_data.shape[0], train_data.shape[1], train_data.shape[2])
 
 # Create the encoder
 encoder_inputs = Input(shape=input_shape, name='encoder_input')
-encoder_conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', padding='same', strides=2)(encoder_inputs)
-encoder_conv2  = Conv1D(filters=128, kernel_size=3, activation='relu', padding='same', strides=2)(encoder_conv1)
-encoder_conv3  = Conv1D(filters=64, kernel_size=3, activation='relu', padding='same', strides=2)(encoder_conv2)
-encoder_conv4 = Conv1D(filters=32, kernel_size=3, activation='relu', padding='same', strides=2)(encoder_conv3)
+encoder_conv1 = Conv1D(filters=256, kernel_size=3, activation='relu', strides=2)(encoder_inputs)
+encoder_conv2  = Conv1D(filters=128, kernel_size=3, activation='relu', strides=2)(encoder_conv1)
+encoder_conv3  = Conv1D(filters=64, kernel_size=3, activation='relu', strides=2)(encoder_conv2)
+encoder_conv4 = Conv1D(filters=32, kernel_size=3, activation='relu', strides=2)(encoder_conv3)
 
 #encoder = Model(encoder_inputs, [encoder_conv4, encoder_conv3, encoder_conv2, encoder_conv1], name='encoder')
 encoder = Model(encoder_inputs, encoder_conv4, name='encoder')
 
 # Create the decoder
-decoder_input_shape = (2264, 32)
+decoder_input_shape = (2262, 32)
 decoder_input = Input(shape=decoder_input_shape)
 
 # Get the encoder outputs for skip connections
 #encoder_outputs = encoder(encoder_inputs)
 #encoder_conv4_output, encoder_conv3_output, encoder_conv2_output, encoder_conv1_output = encoder_outputs
 
-decoder_conv1 = Conv1DTranspose(filters=64, kernel_size=3, activation='relu', padding='same', strides=2)(decoder_input)
-decoder_conv2 = Conv1DTranspose(filters=128, kernel_size=3, activation='relu', padding='same', strides=2)(decoder_conv1)
-decoder_conv3 = Conv1DTranspose(filters=256, kernel_size=3, activation='relu', padding='same', strides=2)(decoder_conv2)
-decoder_conv4 = Conv1DTranspose(filters=num_features, kernel_size=3, activation='sigmoid', padding='same', strides=2, output_padding=1)(decoder_conv3)
-cropped_output = Cropping1D(cropping=(0,decoder_conv4.shape[1] - input_shape[0]))(decoder_conv4)
+decoder_conv1 = Conv1DTranspose(filters=64, kernel_size=3, activation='relu', strides=2)(decoder_input)
+decoder_conv2 = Conv1DTranspose(filters=128, kernel_size=3, activation='relu', strides=2)(decoder_conv1)
+decoder_conv3 = Conv1DTranspose(filters=256, kernel_size=3, activation='relu', strides=2, output_padding=1)(decoder_conv2)
+decoder_conv4 = Conv1DTranspose(filters=num_features, kernel_size=3, activation='sigmoid', strides=2)(decoder_conv3)
+#cropped_output = Cropping1D(cropping=(0,decoder_conv4.shape[1] - input_shape[0]))(decoder_conv4)
 
-decoder = Model(decoder_input, cropped_output, name='decoder')
+decoder = Model(decoder_input, decoder_conv4, name='decoder')
 
 # Build Autoencoder model
 autoencoder_input = Input(shape=input_shape, name='autoencoder_input')
